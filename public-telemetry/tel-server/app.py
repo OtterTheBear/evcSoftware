@@ -5,7 +5,7 @@ from time import time_ns
 app = Flask(
 	__name__,
 	static_url_path='',
-	static_folder="tel-interface/dist/"
+	static_folder="../tel-interface/dist/"
 )
 CORS(app)
 records = []

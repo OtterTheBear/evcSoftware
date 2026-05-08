@@ -13,7 +13,7 @@ import os
 import datetime
 import time
 
-serialport = '/dev/ttyUSB0'
+serialport = '/dev/ttyUSB1'
 
 playbacktick_ms = 100
 # TODO: comment this line out to record a live session
@@ -29,7 +29,7 @@ playbackfilename = None # this is for live data
 if playbackfilename is None:
     t = datetime.datetime.now()
     datetimecode = t.strftime("%Y%m%dT%H%M%S")
-    logfilename = 'evclog_{}.txt'.format( datetimecode )
+    logfilename = 'logs/evclog_{}.txt'.format( datetimecode )
     print( 'logfile: {}'.format( logfilename ) )
     logfile = open( logfilename, "wb", buffering=0 )
 

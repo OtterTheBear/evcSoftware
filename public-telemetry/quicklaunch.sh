@@ -8,17 +8,18 @@ tmux send-keys -t telem:0 'socat -d2 pty pty'
 
 tmux new-window -t telem:1 -n 'app'
 tmux split-window -h -t telem:1
-tmux send-keys -t telem:1.0 'cd lhssevc-app/' Enter
 tmux send-keys -t telem:1.0 '. venv/bin/activate' Enter
+tmux send-keys -t telem:1.0 'cd tel-server/' Enter
 tmux send-keys -t telem:1.0 'gunicorn app:app'
 
 tmux new-window -t telem:2 -n 'host'
-tmux send-keys -t telem:2 'cd host/' Enter
+
 tmux send-keys -t telem:2 '. venv/bin/activate' Enter
-tmux send-keys -t telem:2 'python host.py -s http://127.0.0.1:8080 /dev/ttyUSB0'
+tmux send-keys -t telem:2 'cd tel-host' Enter
+tmux send-keys -t telem:2 'python host.py -s http://127.0.0.1:8080 -vv /dev/ttyUSB0'
 
 # tmux new-window -t telem:3 -n 'web'
-tmux send-keys -t telem:1.1 'cd lhssevc-app/tel-interface/' Enter
+tmux send-keys -t telem:1.1 'cd tel-interface/' Enter
 tmux send-keys -t telem:1.1 'sleep 5' Enter
 tmux send-keys -t telem:1.1 'xdg-open http://127.0.0.1:8080' Enter
 
