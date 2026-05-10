@@ -168,6 +168,7 @@ def process_telemetry_record(record):
 			f"power: {power} watts",
 			f"soc: {volts2soc_agm(b)}%",
 			f"internal resistance: {-m * 1000} mΩ",
+			f"unloaded voltage: {b} volts",
 			f"hall speed: {hall_speed} km/h", '']))
 		data_writer.writerow((time.time_ns(), busv, current, power, hall_speed))
 		saved_records += 1
