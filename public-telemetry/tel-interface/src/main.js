@@ -93,8 +93,10 @@ async function refresh_data() {
 		document.getElementById("busv").textContent = records[records.length - 1][1].toFixed(2);
 		document.getElementById("current").textContent = records[records.length - 1][2].toFixed(2);
 		document.getElementById("power").textContent = records[records.length - 1][3].toFixed(2);
-		document.getElementById("hall-speed").textContent = records[records.length - 1][5].toFixed(2);
 		document.getElementById("soc").textContent = records[records.length - 1][4].toFixed(2);
+		document.getElementById("hall-speed").textContent = records[records.length - 1][5].toFixed(2);
+		document.getElementById("internal-resistance").textContent = records[records.length - 1][6].toFixed(2);
+		document.getElementById("unloaded-voltage").textContent = records[records.length - 1][7].toFixed(2);
 		document.getElementById("records").textContent = records.length;
 		document.getElementById("requests").textContent = req;
 		for (let i = 0; i < result.records.length; i++) {

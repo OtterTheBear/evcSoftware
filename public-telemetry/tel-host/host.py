@@ -77,6 +77,8 @@ info_debug.log("successfully connected")
 
 rawdata = b""
 saved_records = 0
+saved_voltages = []
+saved_currents = []
 
 # continuously poll serial and process records
 def poll_serial(ser):
@@ -134,6 +136,7 @@ def process_record(record):
 # actually process record
 def process_telemetry_record(record):
 	global saved_records
+	global saved_voltages, saved_currents
 	try:
 		busv = float(record[0]) * busv_fac # volts
 		current = float(record[1]) * current_fac # amps
@@ -147,11 +150,24 @@ def process_telemetry_record(record):
 		if not hall_speed_lim[0] <= hall_speed <= hall_speed_lim[1]:
 			return # skip record
 
+		saved_voltages.append(busv)
+		saved_currents.append(current)
+		
+		if len(saved_voltages) != len(saved_currents):
+			raise Exception("Voltage and current lists are of unequal length")
+
+		if len(saved_voltages) > 250:
+			del saved_voltages[0]
+			del saved_currents[0]
+
+		m,b = np.polyfit( saved_currents, saved_voltages, 1 ) # taken from /WilsonAPP/tkinter-telemetry.py
+		
 		data_debug.log('\n'.join([
 			f"busv: {busv} volts",
 			f"current: {current} amps",
 			f"power: {power} watts",
-			f"soc: {volts2soc_agm(busv)}%"
+			f"soc: {volts2soc_agm(b)}%",
+			f"internal resistance: {-m * 1000} mΩ",
 			f"hall speed: {hall_speed} km/h", '']))
 		data_writer.writerow((time.time_ns(), busv, current, power, hall_speed))
 		saved_records += 1
@@ -164,19 +180,21 @@ def process_telemetry_record(record):
 
 		if server_addr is not None:
 			# uploader.new_record({
-			# 	"timestamp": time.time_ns(), # timestamp in unix nanoseconds
-			# 	"busv": busv,
-			# 	"current": current,
-			# 	"power": power,
-			# 	"soc": volts2soc_agm(busv),
-			# 	"hall_speed": hall_speed})
+			#	"timestamp": time.time_ns(), # timestamp in unix nanoseconds
+			#	"busv": busv,
+			#	"current": current,
+			#	"power": power,
+			#	"soc": volts2soc_agm(busv),
+			#	"hall_speed": hall_speed})
 			uploader.new_record([
 				time.time_ns(),
 				busv,
 				current,
 				power,
-				volts2soc_agm(busv),
-				hall_speed
+				volts2soc_agm(b),
+				hall_speed,
+				-m * 1000, # internal resistance (milliohms)
+				b # unloaded voltage
 			])
 
 	except ValueError as e:
