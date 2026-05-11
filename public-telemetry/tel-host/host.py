@@ -153,22 +153,21 @@ def process_telemetry_record(record):
 		saved_voltages.append(busv)
 		saved_currents.append(current)
 		
-		if len(saved_voltages) != len(saved_currents):
-			raise Exception("Voltage and current lists are of unequal length")
+		assert len(saved_voltages) == len(saved_currents)
 
 		if len(saved_voltages) > 250:
 			del saved_voltages[0]
 			del saved_currents[0]
 
-		m,b = np.polyfit( saved_currents, saved_voltages, 1 ) # taken from /WilsonAPP/tkinter-telemetry.py
+		v_unloaded, int_r = np.polyfit(saved_currents, saved_voltages, 1) # taken from /WilsonAPP/tkinter-telemetry.py
 		
 		data_debug.log('\n'.join([
 			f"busv: {busv} volts",
 			f"current: {current} amps",
 			f"power: {power} watts",
-			f"soc: {volts2soc_agm(b)}%",
-			f"internal resistance: {-m * 1000} mΩ",
-			f"unloaded voltage: {b} volts",
+			f"soc: {volts2soc_agm(v_unloaded)}%",
+			f"internal resistance: {-int_r * 1000} mΩ",
+			f"unloaded voltage: {v_unloaded} volts",
 			f"hall speed: {hall_speed} km/h", '']))
 		data_writer.writerow((time.time_ns(), busv, current, power, hall_speed))
 		saved_records += 1
@@ -192,10 +191,10 @@ def process_telemetry_record(record):
 				busv,
 				current,
 				power,
-				volts2soc_agm(b),
+				volts2soc_agm(v_unloaded),
 				hall_speed,
-				-m * 1000, # internal resistance (milliohms)
-				b # unloaded voltage
+				-int_r * 1000, # internal resistance (milliohms)
+				v_unloaded # unloaded voltage
 			])
 
 	except ValueError as e:
